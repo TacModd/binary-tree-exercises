@@ -60,6 +60,130 @@ node* insert(int value, node* treepointer)
 }
 
 
+// binary tree remove element helper prototype
+node* deletHelper(node* deletThis)
+
+// binary tree remove element function
+int delet(int value, node* treepointer)
+{
+    node* parent = treepointer;
+    node* child = treepointer;
+    int isLeft = 0;
+    
+    while (child->n != value)
+    {
+        parent = child;
+        if (value <= child->n)
+        {
+            isLeft = 1;
+            child = child->left;
+        }
+        else
+        {
+            isLeft = 0;
+            child = child->right;
+        }
+        if (child == NULL)
+        {
+            return 0;
+        }
+    }
+    
+    if (child->left == NULL && child->right == NULL)
+    {
+        if (child == treepointer)
+        {
+            treepointer = NULL;
+        }
+        else if (isLeft == 1)
+        {
+            parent->left = NULL;
+        }
+        else
+        {
+            parent->right = NULL;
+        }
+    }
+    
+    else if (child->right == NULL)
+    {
+        if (child == treepointer)
+        {
+            treepointer = child->left;
+           }
+        else if (isLeft == 1)
+        {
+            parent->left = child->left;
+        }
+        else
+        {
+            parent->right = child->left;
+        }
+    }
+    
+    else if (child->left == NULL)
+    {
+        if (child == treepointer)
+        {
+            treepointer = child->right;
+        }
+        else if (isLeft == 0)
+        {
+            parent->left = child->right;
+        }
+        else
+        {
+            parent->right = child->left;
+        }
+    }
+    
+    else
+    {
+        node* replacement = terminateHelper(child);
+    
+        if (child == treepointer)
+        {
+            treepointer = replacement;
+        }
+        else if (isLeft == 1)
+        {
+            parent->left = replacement;
+        }
+        else
+        {
+            parent->right = replacement;
+        }
+    
+        replacement->left = child->left;
+    }
+    
+    return 1;
+}
+
+// binary tree remove element helper function
+node* deletHelper(node* deletThis)
+{
+    node* replacement = NULL;
+    node* parent = NULL;
+    node* grandchild = deletThis->right;
+    
+    while (grandchild != NULL)
+    {
+        parent = replacement;
+        replacement = grandchild;
+        grandchild = grandchild->left;
+    }
+    
+    if (replacement != deletThis->right)
+    {
+        parent->left = replacement->right;
+        replacement->right = deletThis->right;
+    }
+    
+    return replacement;
+}
+
+
 // height
 int height(node* treepointer)
 {
