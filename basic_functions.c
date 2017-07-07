@@ -235,9 +235,43 @@ void posttrav(node* treepointer)
 }
 
 
-// levelorder (BFS)
+// levelorder traversal helper prototype
+void printLevel(node* treepointer, int level)
+
+// levelorder (BFS) recursive
+void leveltrav(node* treepointer)
+{
+    int h = height(treepointer);
+    int i;
+    for (i=1; i<=h; i++)
+        printLevel(treepointer, i);
+}
+ 
+// levelorder recursive traversal helper
+void printLevel(node* treepointer, int level)
+{
+    if (treepointer == NULL)
+        return;
+    if (level == 1)
+        printf("%i\n", treepointer->n);
+    else if (level > 1)
+    {
+        printLevel(treepointer->left, level - 1);
+        printLevel(treepointer->right, level - 1);
+    }
+}
 
 
+// function to free memory (postorder)
+void freetree(node* treepointer)
+{
+  if (treepointer != NULL)
+  {
+    posttrav(treepointer->left);
+    posttrav(treepointer->right);
+    free(treepointer);
+  }
+}
 
 
 // main
