@@ -1,14 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "basic_functions.c"
+/**
+ * Note: this file requires "basic_functions.c" to work
+ */
 
 
 
 /* FUNCTIONS */
 
 
-// preorder (DFS)
+/**
+ * pre order (DFS) tree traversal
+ */
 void pretrav(node* treepointer)
 {
     if (treepointer != NULL)
@@ -20,7 +24,9 @@ void pretrav(node* treepointer)
 }
 
 
-// inorder
+/**
+ * in order tree traversal
+ */
 void intrav(node* treepointer)
 {
     if (treepointer != NULL)
@@ -32,7 +38,9 @@ void intrav(node* treepointer)
 }
 
 
-// postorder
+/**
+ * post order tree traversal
+ */
 void posttrav(node* treepointer)
 {
     if (treepointer != NULL)
@@ -44,19 +52,24 @@ void posttrav(node* treepointer)
 }
 
 
-// levelorder traversal helper prototype
-void printLevel(node* treepointer, int level)
+// level order traversal helper prototype
+void printLevel(node* treepointer, int level);
 
-// levelorder (BFS) recursive
+/**
+ * level order tree traversal (BFS) -- recursive implementation
+ */
 void leveltrav(node* treepointer)
 {
     int h = height(treepointer);
     int i;
     for (i=1; i<=h; i++)
+        // call helper passing value of current level
         printLevel(treepointer, i);
 }
- 
-// levelorder recursive traversal helper
+
+/**
+ * level order tree traversal helper
+ */
 void printLevel(node* treepointer, int level)
 {
     if (treepointer == NULL)
@@ -65,12 +78,8 @@ void printLevel(node* treepointer, int level)
         printf("%i\n", treepointer->n);
     else if (level > 1)
     {
+        // explore subtrees until all nodes for current level are printed
         printLevel(treepointer->left, level - 1);
         printLevel(treepointer->right, level - 1);
     }
-}
-
-
-int main() {
-    
 }
