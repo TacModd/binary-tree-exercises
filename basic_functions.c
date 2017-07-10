@@ -44,37 +44,37 @@ int search(int value, node* treepointer)
 /**
  * binary tree add element function (returns tree root)
  */
-node* insert(int value, node* treepointer)
+node* insert(int value, node** treepointer)
 {
-    if (treepointer == NULL)
+    if (*treepointer == NULL)
     {
-        treepointer = malloc(sizeof(node));
-        treepointer->n = value;
+        *treepointer = malloc(sizeof(node));
+        (*treepointer)->n = value;
     }
-    else if (value <= treepointer->n)
+    else if (value <= (*treepointer)->n)
     {
-        insert(value, treepointer->left);
+        (*treepointer)->left = insert(value, &(*treepointer)->left);
     }
     else
     {
-        insert(value, treepointer->right);
+        (*treepointer)->right = insert(value, &(*treepointer)->right);
     }
-    return treepointer;
+    return *treepointer;
 }
 
 
 // binary tree remove element helper prototype
-node* deletHelper(node* deletThis)
+node* deletHelper(node* deletThis);
 
 /**
  * binary tree remove element function (returns 0 for failure, 1 for success)
  */
-int delet(int value, node* treepointer)
+int delet(int value, node** treepointer)
 {
     // declare pointer which will identify the node to delete
-    node* child = treepointer;
+    node* child = (*treepointer);
     // declare pointer which will track parent node (makes tree easier to fix after deletion)
-    node* parent = treepointer;
+    node* parent = (*treepointer);
     // declare integer which will track the path of said parent to child (left or right)
     int isLeft = 0;
     
@@ -107,20 +107,24 @@ int delet(int value, node* treepointer)
     if (child->left == NULL && child->right == NULL)
     {
         // if node is the root then delete tree
-        if (child == treepointer)
+        if (child == (*treepointer))
         {
-            treepointer = NULL;
+            // no action required
+            ;
         }
         
         // else delete edge pointing to node
         
-        else if (isLeft == 1)
-        {
-            parent->left = NULL;
-        }
         else
         {
-            parent->right = NULL;
+            if (isLeft == 1)
+            {
+                parent->left = NULL;
+            }
+            else
+            {
+                parent->right = NULL;
+            }
         }
     }
     
@@ -128,33 +132,39 @@ int delet(int value, node* treepointer)
     
     else if (child->right == NULL)
     {
-        if (child == treepointer)
+        if (child == (*treepointer))
         {
-            treepointer = child->left;
-           }
-        else if (isLeft == 1)
-        {
-            parent->left = child->left;
+            (*treepointer) = child->left;
         }
         else
         {
-            parent->right = child->left;
+            if (isLeft == 1)
+            {
+                parent->left = child->left;
+            }
+            else
+            {
+                parent->right = child->left;
+            }
         }
     }
     
     else if (child->left == NULL)
     {
-        if (child == treepointer)
+        if (child == (*treepointer))
         {
-            treepointer = child->right;
-        }
-        else if (isLeft == 1)
-        {
-            parent->left = child->right;
+            (*treepointer) = child->right;
         }
         else
         {
-            parent->right = child->right;
+            if (isLeft == 1)
+            {
+                parent->left = child->right;
+            }
+            else
+            {
+                parent->right = child->right;
+            }
         }
     }
     
@@ -166,23 +176,29 @@ int delet(int value, node* treepointer)
         
         // make root replacement or update parent to point to replacement
         
-        if (child == treepointer)
+        if (child == (*treepointer))
         {
-            treepointer = replacement;
-        }
-        else if (isLeft == 1)
-        {
-            parent->left = replacement;
+            (*treepointer) = replacement;
         }
         else
         {
-            parent->right = replacement;
+            if (isLeft == 1)
+            {
+                parent->left = replacement;
+            }
+            else
+            {
+                parent->right = replacement;
+            }
         }
+        
         
         // update replacement to point to left subtree (helper takes care of right subtree)
         replacement->left = child->left;
     }
     
+    // free memory
+    free(child);
     // return success
     return 1;
 }
@@ -231,13 +247,13 @@ node* deletHelper(node* deletThis)
 
 
 /**
- * tree height function (returns -1 for empty tree, else the number of levels)
+ * tree height function (returns 0 for empty tree, else the number of levels)
  */
 int height(node* treepointer)
 {
     if (treepointer == NULL)
     {
-        return -1;
+        return 0;
     }
     else
     {
@@ -253,18 +269,27 @@ void freetree(node* treepointer)
 {
   if (treepointer != NULL)
   {
-    posttrav(treepointer->left);
-    posttrav(treepointer->right);
+    freetree(treepointer->left);
+    freetree(treepointer->right);
     free(treepointer);
   }
 }
 
 
-// main
-int main() {
-    node *tree = NULL;
-    tree = insert(9, tree);
-    printf("%i\n", tree->n);
-    printf("%i\n", search(9, tree));
-    return 0
-}
+
+/**
+ * A note on function design for node insertion and deletion:
+ * 
+ * In C, arguments are passed by value, which means functions receive copies
+ * of variables rather than the variables themselves. If an argument is changed
+ * inside a function, the change is lost unless it is passed back to the caller.
+ * 
+ * This makes the implementation of node insertion and deletion more difficult
+ * when we want to alter the address of the node passed to the function (which
+ * is a copy of the real address).
+ * 
+ * This problem is overcome (as in the functions above) by designing the functions
+ * to accept a pointer to a pointer (**) and passing the address (&) of the declared
+ * node* pointer in main. The code looks a little messier, but editing the address
+ * of the node (node*) is made much easier.
+ */
