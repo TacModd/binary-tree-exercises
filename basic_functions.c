@@ -18,7 +18,9 @@ typedef struct node
 /* FUNCTIONS */
 
 
-// binary tree search function
+/**
+ * binary tree search function (returns 0 for failure, 1 for success)
+ */
 int search(int value, node* treepointer)
 {
     if (treepointer == NULL)
@@ -39,8 +41,9 @@ int search(int value, node* treepointer)
     }
 }
 
-
-// binary tree add element function
+/**
+ * binary tree add element function (returns tree root)
+ */
 node* insert(int value, node* treepointer)
 {
     if (treepointer == NULL)
@@ -63,16 +66,24 @@ node* insert(int value, node* treepointer)
 // binary tree remove element helper prototype
 node* deletHelper(node* deletThis)
 
-// binary tree remove element function
+/**
+ * binary tree remove element function (returns 0 for failure, 1 for success)
+ */
 int delet(int value, node* treepointer)
 {
-    node* parent = treepointer;
+    // declare pointer which will identify the node to delete
     node* child = treepointer;
+    // declare pointer which will track parent node (makes tree easier to fix after deletion)
+    node* parent = treepointer;
+    // declare integer which will track the path of said parent to child (left or right)
     int isLeft = 0;
     
+    // while value undiscovered
     while (child->n != value)
     {
+        // update parent to child
         parent = child;
+        // update child to next descendant and update path taken
         if (value <= child->n)
         {
             isLeft = 1;
@@ -83,18 +94,26 @@ int delet(int value, node* treepointer)
             isLeft = 0;
             child = child->right;
         }
+        // if NULL is reached, node with given value does not exist in tree
         if (child == NULL)
         {
             return 0;
         }
     }
     
+    // if while loop exits then node is discovered and needs to be deleted
+    
+    // if node is a leaf...
     if (child->left == NULL && child->right == NULL)
     {
+        // if node is the root then delete tree
         if (child == treepointer)
         {
             treepointer = NULL;
         }
+        
+        // else delete edge pointing to node
+        
         else if (isLeft == 1)
         {
             parent->left = NULL;
@@ -104,6 +123,8 @@ int delet(int value, node* treepointer)
             parent->right = NULL;
         }
     }
+    
+    // else if node has one child, update parent to point to descendant
     
     else if (child->right == NULL)
     {
@@ -127,20 +148,24 @@ int delet(int value, node* treepointer)
         {
             treepointer = child->right;
         }
-        else if (isLeft == 0)
+        else if (isLeft == 1)
         {
             parent->left = child->right;
         }
         else
         {
-            parent->right = child->left;
+            parent->right = child->right;
         }
     }
     
+    // else if node to delete has two children
     else
     {
-        node* replacement = terminateHelper(child);
-    
+        // identify a suitable replacement node
+        node* replacement = deletHelper(child);
+        
+        // make root replacement or update parent to point to replacement
+        
         if (child == treepointer)
         {
             treepointer = replacement;
@@ -153,38 +178,61 @@ int delet(int value, node* treepointer)
         {
             parent->right = replacement;
         }
-    
+        
+        // update replacement to point to left subtree (helper takes care of right subtree)
         replacement->left = child->left;
     }
     
+    // return success
     return 1;
 }
 
-// binary tree remove element helper function
+/**
+ * binary tree remove element helper function (returns replacement node)
+ */
 node* deletHelper(node* deletThis)
 {
+    // declare replacement ("child") pointer
     node* replacement = NULL;
+    // declare pointer to track parent
     node* parent = NULL;
+    // declare pointer to search grandchildren
     node* grandchild = deletThis->right;
     
+    // while there are descendants to search...
     while (grandchild != NULL)
     {
+        // update parent to child
         parent = replacement;
+        // update child to grandchild
         replacement = grandchild;
+        // search left grandchild
         grandchild = grandchild->left;
     }
     
+    /**
+     * note: the decision to go right and then left to find a replacement is 
+     * arbitrary; going left and then right also works and may have produced 
+     * a more 'suitable' replacement depending on the size of both branches
+     */
+    
+    // if replacement is a node other than the node to delete's immediate child...
     if (replacement != deletThis->right)
     {
+        // update parent->left to replacement->right (there are no left children as per above loop)
         parent->left = replacement->right;
+        // update replacement->right to deletThis->right (preserves subtree)
         replacement->right = deletThis->right;
     }
     
+    // return replacement to main function
     return replacement;
 }
 
 
-// height
+/**
+ * tree height function (returns -1 for empty tree, else the number of levels)
+ */
 int height(node* treepointer)
 {
     if (treepointer == NULL)
@@ -198,7 +246,9 @@ int height(node* treepointer)
 }
 
 
-// function to free memory (postorder)
+/**
+ * free memory function (post order traversal to visit all branches before the root)
+ */
 void freetree(node* treepointer)
 {
   if (treepointer != NULL)
